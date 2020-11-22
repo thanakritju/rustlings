@@ -3,6 +3,7 @@
 // instead of the target type itself.
 // You can read more about it at https://doc.rust-lang.org/std/convert/trait.TryFrom.html
 use std::convert::{TryFrom, TryInto};
+use std::error::Error;
 
 #[derive(Debug, PartialEq)]
 struct Color {
@@ -10,8 +11,6 @@ struct Color {
     green: u8,
     blue: u8,
 }
-
-// I AM NOT DONE
 
 // Your task is to complete this implementation
 // and return an Ok result of inner type Color.
@@ -22,22 +21,74 @@ struct Color {
 // but the slice implementation needs to check the slice length!
 // Also note that correct RGB color values must be integers in the 0..=255 range.
 
+fn isInU8Range(number: i16) -> bool {
+    number >= 0 && number <= 255
+}
+
+fn checkColor(red: i16, green:i16, blue:i16) -> bool {
+    isInU8Range(red) && isInU8Range(green) && isInU8Range(blue) 
+}
+
 // Tuple implementation
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = String;
-    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {}
+    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let red = tuple.0;
+        let green = tuple.1;
+        let blue = tuple.2;
+        
+        if checkColor(red, green, blue) {
+            return Ok(Color {
+                red: red as u8,
+                green: green as u8,
+                blue: blue as u8,
+            })
+        } else {
+            return Err(String::from("Not in range"))
+        }
+    }
 }
 
 // Array implementation
 impl TryFrom<[i16; 3]> for Color {
     type Error = String;
-    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {}
+    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let red = arr[0];
+        let green = arr[1];
+        let blue = arr[2];
+        if checkColor(red, green, blue) {
+            return Ok(Color {
+                red: red as u8,
+                green: green as u8,
+                blue: blue as u8,
+            })
+        } else {
+            return Err(String::from("Not in range"))
+        }
+    }
 }
 
 // Slice implementation
 impl TryFrom<&[i16]> for Color {
     type Error = String;
-    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {}
+    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err(String::from("Not in range"))
+        }
+        let red = slice[0];
+        let green = slice[1];
+        let blue = slice[2];
+
+        if checkColor(red, green, blue) {
+            return Ok(Color {
+                red: red as u8,
+                green: green as u8,
+                blue: blue as u8,
+            })
+        } else {
+            return Err(String::from("Not in range"))
+        }
+    }
 }
 
 fn main() {
